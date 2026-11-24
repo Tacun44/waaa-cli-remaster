@@ -237,6 +237,19 @@ See [SECURITY.md](./SECURITY.md) for how to report vulnerabilities.
 
 [MIT](./LICENSE)
 
+## Windows (rama `windows`)
+
+Esta rama compila en Windows nativo. Funciona la TUI, mensajes, fotos, archivos y vistos. **No** funcionan llamadas, notas de voz grabadas ni pausar audio.
+
+```powershell
+git clone -b windows https://github.com/Tacun44/waaa-cli-remaster
+cd waaa-cli-remaster
+go build -o wa-cli.exe .
+.\wa-cli.exe login
+```
+
+Requiere [Go 1.25+](https://go.dev/dl/). Usa Windows Terminal para que los colores se vean bien.
+
 ## Repos originales
 
 Los verdaderos autores de las piezas que componen este proyecto:
