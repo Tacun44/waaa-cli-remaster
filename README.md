@@ -1,6 +1,6 @@
 # wa-cli
 
-> Hola, ¿cómo están? Bueno, este proyecto realmente fue una mezcla entre el backend que encontré y un frontend WoW que encontré. Entonces, espero que les guste mi adaptación. Los verdaderos repos van a estar aquí abajo del README.
+> Hola, ¿cómo están? Bueno, este proyecto realmente fue una mezcla entre el backend que encontré y un frontend go que encontré. Entonces, espero que les guste mi adaptación. Los verdaderos repos van a estar aquí abajo del README.
 
 > **Fork** de [codebyoketch/wa-cli](https://github.com/codebyoketch/wa-cli) (MIT) con mejoras propias: notas de voz y transcripción, llamadas, vistos/presencia, selección múltiple, menú contextual, arrastrar archivos, notificaciones y más.
 >
