@@ -1,5 +1,7 @@
 # wa-cli
 
+> Hola, ¿cómo están? Bueno, este proyecto realmente fue una mezcla entre el backend que encontré y un frontend WoW que encontré. Entonces, espero que les guste mi adaptación. Los verdaderos repos van a estar aquí abajo del README.
+
 > **Fork** de [codebyoketch/wa-cli](https://github.com/codebyoketch/wa-cli) (MIT) con mejoras propias: notas de voz y transcripción, llamadas, vistos/presencia, selección múltiple, menú contextual, arrastrar archivos, notificaciones y más.
 >
 > **Backend:** no se copia código de WhatsApp. Se usa como dependencia [`polymorfa/hypermeow`](https://github.com/polymorfa/hypermeow) (variante de [whatsmeow](https://github.com/tulir/whatsmeow)) y [`meowcaller`](https://github.com/purpshell/meowcaller). Créditos a sus autores.
@@ -234,3 +236,14 @@ See [SECURITY.md](./SECURITY.md) for how to report vulnerabilities.
 ## License
 
 [MIT](./LICENSE)
+
+## Repos originales
+
+Los verdaderos autores de las piezas que componen este proyecto:
+
+| Pieza | Repo |
+|---|---|
+| Frontend (TUI/CLI) original | [codebyoketch/wa-cli](https://github.com/codebyoketch/wa-cli) |
+| Backend de WhatsApp (variante) | [polymorfa/hypermeow](https://github.com/polymorfa/hypermeow) |
+| Backend base | [tulir/whatsmeow](https://github.com/tulir/whatsmeow) |
+| Llamadas de audio/video | [purpshell/meowcaller](https://github.com/purpshell/meowcaller) |
