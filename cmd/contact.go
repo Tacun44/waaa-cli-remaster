@@ -1,0 +1,189 @@
+package cmd
+
+import (
+	"context"
+	"fmt"
+	"strings"
+
+	"github.com/spf13/cobra"
+	waLog "github.com/polymorfa/hypermeow/util/log"
+
+	"github.com/codebyoketch/wa-cli/internal/store"
+	"github.com/codebyoketch/wa-cli/internal/whatsapp"
+)
+
+var contactCmd = &cobra.Command{
+	Use:   "contact",
+	Short: "List, search, and inspect your WhatsApp contacts",
+	Long: `List, search, and inspect your WhatsApp contacts.
+
+Unlike chat commands, these read your local contact list directly and
+don't need a network connection — WhatsApp syncs contacts to the device
+during login and keeps them updated from there.`,
+}
+
+var contactListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all contacts",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		contacts, err := loadContacts()
+		if err != nil {
+			return err
+		}
+		return outputContacts(cmd, contacts)
+	},
+}
+
+var contactSearchCmd = &cobra.Command{
+	Use:   "search <query>",
+	Short: "Search contacts by name",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		contacts, err := loadContacts()
+		if err != nil {
+			return err
+		}
+
+		q := strings.ToLower(args[0])
+		var results []whatsapp.Contact
+		for _, c := range contacts {
+			if strings.Contains(strings.ToLower(c.Name), q) ||
+				strings.Contains(strings.ToLower(c.PushName), q) ||
+				strings.Contains(c.JID, args[0]) {
+				results = append(results, c)
+			}
+		}
+		return outputContacts(cmd, results)
+	},
+}
+
+var contactInfoCmd = &cobra.Command{
+	Use:   "info <name-or-jid>",
+	Short: "Show details for one contact",
+	Args:  cobra.ExactArgs(1),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) > 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		contacts, err := loadContacts()
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		q := strings.ToLower(toComplete)
+		var names []string
+		for _, c := range contacts {
+			name := c.Name
+			if name == "" {
+				name = c.PushName
+			}
+			if name == "" {
+				continue
+			}
+			if strings.HasPrefix(strings.ToLower(name), q) {
+				names = append(names, name)
+			}
+		}
+		return names, cobra.ShellCompDirectiveNoFileComp
+	},
+	RunE: func(cmd *cobra.Command, args []string) error {
+		contacts, err := loadContacts()
+		if err != nil {
+			return err
+		}
+
+		target := args[0]
+
+		// Exact match first (JID or name).
+		for _, c := range contacts {
+			if c.JID == target || strings.EqualFold(c.Name, target) {
+				return outputContactDetail(cmd, c)
+			}
+		}
+
+		// Fall back to substring match, take the first hit.
+		q := strings.ToLower(target)
+		for _, c := range contacts {
+			if strings.Contains(strings.ToLower(c.Name), q) || strings.Contains(c.JID, target) {
+				return outputContactDetail(cmd, c)
+			}
+		}
+
+		return fmt.Errorf("no contact found matching %q", target)
+	},
+}
+
+func init() {
+	contactCmd.AddCommand(contactListCmd, contactSearchCmd, contactInfoCmd)
+	rootCmd.AddCommand(contactCmd)
+}
+
+func loadContacts() ([]whatsapp.Contact, error) {
+	var contacts []whatsapp.Contact
+	err := captureLibraryStdout(func() error {
+		ctx := context.Background()
+		dbLog := waLog.Stdout("Database", "WARN", true)
+
+		container, err := store.Open(ctx, a.Config.DataDir, dbLog)
+		if err != nil {
+			return err
+		}
+
+		client, err := whatsapp.New(ctx, container, dbLog, nil, nil)
+		if err != nil {
+			return err
+		}
+		if !client.IsLoggedIn() {
+			return fmt.Errorf("not logged in: run 'wa login' first")
+		}
+
+		contacts, err = client.ListContacts(ctx)
+		return err
+	})
+	return contacts, err
+}
+
+func outputContacts(cmd *cobra.Command, contacts []whatsapp.Contact) error {
+	if useJSON(cmd) {
+		if contacts == nil {
+			contacts = []whatsapp.Contact{}
+		}
+		return printJSON(cmd, contacts)
+	}
+	printContacts(contacts)
+	return nil
+}
+
+func outputContactDetail(cmd *cobra.Command, c whatsapp.Contact) error {
+	if useJSON(cmd) {
+		return printJSON(cmd, c)
+	}
+	printContactDetail(c)
+	return nil
+}
+
+func printContacts(contacts []whatsapp.Contact) {
+	if len(contacts) == 0 {
+		fmt.Println("No contacts found.")
+		return
+	}
+	for _, c := range contacts {
+		name := c.Name
+		if name == "" {
+			name = "(no name)"
+		}
+		fmt.Printf("%-30s %s\n", name, c.JID)
+	}
+}
+
+func printContactDetail(c whatsapp.Contact) {
+	fmt.Printf("JID:           %s\n", c.JID)
+	if c.Name != "" {
+		fmt.Printf("Name:          %s\n", c.Name)
+	}
+	if c.PushName != "" {
+		fmt.Printf("Push name:     %s\n", c.PushName)
+	}
+	if c.BusinessName != "" {
+		fmt.Printf("Business name: %s\n", c.BusinessName)
+	}
+}

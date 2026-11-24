@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # Sigue el backend (hypermeow / whatsmeow): abre un PR cuando salga versión nueva
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: daily
+    groups:
+      whatsapp-backend:
+        patterns:
+          - "github.com/polymorfa/hypermeow"
+          - "go.mau.fi/*"

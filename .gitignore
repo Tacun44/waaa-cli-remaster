@@ -1,0 +1,11 @@
+# binarios locales y respaldos
+/bin/
+*.bin
+*.bin.*
+wa-cli.backup-*
+# notas personales
+docs/obsidian_chat_node_guide.md
+# datos de sesión / claves
+*.db
+*.key
+.env
