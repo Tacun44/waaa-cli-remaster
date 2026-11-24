@@ -25,7 +25,6 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -89,22 +88,15 @@ func Run(a *app.App) error {
 	// internal/whatsapp.New builds for the whatsmeow client itself —
 	// then hand Bubble Tea the real terminal explicitly so its own
 	// rendering is unaffected by the swap.
-	oldFd, err := syscall.Dup(int(os.Stdout.Fd()))
-	var ttyOut *os.File
-	if err == nil {
-		ttyOut = os.NewFile(uintptr(oldFd), "/dev/stdout")
-	} else {
-		ttyOut = os.Stdout
-	}
-
 	logPath := filepath.Join(a.Config.DataDir, "tui.log")
-	if logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644); err == nil {
-		_ = syscall.Dup2(int(logFile.Fd()), int(os.Stdout.Fd()))
-		os.Stdout = logFile
+	var logFile *os.File
+	if f, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644); err == nil {
+		logFile = f
 		defer func() {
 			logFile.Close()
 		}()
 	}
+	ttyOut := redirectStdout(logFile)
 
 	dbLog := waLog.Stdout("Database", "WARN", true)
 
@@ -4951,13 +4943,13 @@ func (m model) handlePlayAudio() (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 	if target.ID == m.playingAudioID && m.audioPlayer != nil && m.audioPlayer.Process != nil && m.audioPlayer.ProcessState == nil {
-		signal := syscall.SIGSTOP
+		signal := pauseProcess
 		status := "Audio pausado"
 		if m.audioPaused {
-			signal = syscall.SIGCONT
+			signal = resumeProcess
 			status = "Reproduciendo nota de voz"
 		}
-		if err := m.audioPlayer.Process.Signal(signal); err != nil {
+		if err := signal(m.audioPlayer.Process); err != nil {
 			m.statusLine = "No se pudo cambiar la reproducción: " + err.Error()
 			return m, nil
 		}
