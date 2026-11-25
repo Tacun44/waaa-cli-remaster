@@ -11,7 +11,7 @@ require (
 	github.com/lrstanley/bubblezone v1.0.0
 	github.com/mdp/qrterminal/v3 v3.2.1
 	github.com/muesli/termenv v0.16.0
-	github.com/polymorfa/hypermeow v0.0.0-20260906031440-90f9e4ec2c88
+	github.com/polymorfa/hypermeow v0.0.0
 	github.com/rmhubbert/bubbletea-overlay v0.6.9
 	github.com/spf13/cobra v1.10.2
 	google.golang.org/protobuf v1.36.11
@@ -36,7 +36,7 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.4.1 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.15 // indirect
-	github.com/charmbracelet/x/term v0.2.2 // indirect
+	github.com/charmbracelet/x/term v0.2.2
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/coder/websocket v1.8.15 // indirect
@@ -62,7 +62,7 @@ require (
 	github.com/purpshell/meowcaller v0.0.0-20260906234207-c48c3e2a243c
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/rs/zerolog v1.35.1 // indirect
+	github.com/rs/zerolog v1.35.1
 	github.com/sergeymakinen/go-bmp v1.0.0 // indirect
 	github.com/sergeymakinen/go-ico v1.0.0-beta.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
